@@ -46,32 +46,53 @@ namespace ecaldqm
       float tMax(0.5);
       float nMax(0.);
       for(int iBin(0); iBin < 6; iBin++){
-	float entries(sMatchedIndex.getBinContent(ttid, iBin + 1));
-	towerEntries += entries;
+        float entries(sMatchedIndex.getBinContent(ttid, iBin + 1));
+        towerEntries += entries;
 
-	if(entries > nMax){
-	  nMax = entries;
-	  tMax = iBin == 0 ? -0.5 : iBin + 0.5; // historical reasons.. much clearer to say "no entry = -0.5"
-	}
+        if(entries > nMax){
+          nMax = entries;
+          tMax = iBin == 0 ? -0.5 : iBin + 0.5; // historical reasons.. much clearer to say "no entry = -0.5"
+        }
       }
 
       meTimingSummary.setBinContent(ttid, tMax);
 
       if(towerEntries < minEntries_){
-	meEmulQualitySummary.setBinContent(ttid, doMask ? kMUnknown : kUnknown);
-	continue;
+        meEmulQualitySummary.setBinContent(ttid, doMask ? kMUnknown : kUnknown);
+        continue;
       }
 
       float nonsingleFraction(1. - nMax / towerEntries);
 
       if(nonsingleFraction > 0.)
-	meNonSingleSummary.setBinContent(ttid, nonsingleFraction);
+        meNonSingleSummary.setBinContent(ttid, nonsingleFraction);
 
       if(sEtEmulError.getBinContent(ttid) / towerEntries > errorFractionThreshold_)
         meEmulQualitySummary.setBinContent(ttid, doMask ? kMBad : kBad);
       else
         meEmulQualitySummary.setBinContent(ttid, doMask ? kMGood : kGood);
     }
+
+    MESet& meTTF4vMask(MEs_.at("TTF4vMask"));
+    MESet const& sTTFlags4(sources_.at("TTFlags4"));
+    MESet const& sTTMaskMapAll(sources_.at("TTMaskMapAll"));
+    
+    // Occupancy vs Masking
+    for(unsigned iTT(0); iTT < EcalTrigTowerDetId::kSizeForDenseIndexing; iTT++) {
+      EcalTrigTowerDetId ttid(EcalTrigTowerDetId::detIdFromDenseIndex(iTT));
+      bool isMasked( sTTMaskMapAll.getBinContent(ttid) > 0. );
+      bool hasTTF4( sTTFlags4.getBinContent(ttid) > 0. );
+      if ( isMasked ) {
+        if ( hasTTF4 )
+          meTTF4vMask.setBinContent( ttid,12 ); // Masked, has TTF4
+        else
+          meTTF4vMask.setBinContent( ttid,11 ); // Masked, no TTF4
+      } else {
+        if ( hasTTF4 )
+          meTTF4vMask.setBinContent( ttid,13 ); // not Masked, has TTF4
+      }
+    } // Occupancy vs Masking
+
   }
 
   DEFINE_ECALDQM_WORKER(TrigPrimClient);

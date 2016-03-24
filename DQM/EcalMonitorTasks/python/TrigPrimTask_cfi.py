@@ -23,7 +23,9 @@ ecalTrigPrimTask = cms.untracked.PSet(
     params = cms.untracked.PSet(
         #    HLTMuonPath = cms.untracked.string('HLT_Mu5_v*'),
         #    HLTCaloPath = cms.untracked.string('HLT_SingleJet*'),
-        runOnEmul = cms.untracked.bool(True)
+        runOnEmul = cms.untracked.bool(True),
+        TPCollection = cms.untracked.InputTag("ecalDigis", "EcalTriggerPrimitives")
+        #TPCollection = cms.InputTag("ecalDigis","EcalTriggerPrimitives")
     ),
     MEs = cms.untracked.PSet(
         LowIntMap = cms.untracked.PSet(
@@ -149,9 +151,34 @@ ecalTrigPrimTask = cms.untracked.PSet(
             btype = cms.untracked.string('DCC'),
             description = cms.untracked.string('Distribution of the trigger tower flags.')
         ),
+        ## NEW STUFF ##
+        TTFlagsMap = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sTriggerTowerTask/%(prefix)sTTT TT Status Flags%(suffix)s'),
+            kind = cms.untracked.string('TH2F'),
+            otype = cms.untracked.string('Ecal3P'),
+            btype = cms.untracked.string('TriggerTower'),
+            description = cms.untracked.string('Map of the trigger tower flags.')
+        ),
+        TTFlags4 = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sTriggerTowerTask/%(prefix)sTTT TTF4 Occupancy%(suffix)s'),
+            kind = cms.untracked.string('TH2F'),
+            otype = cms.untracked.string('Ecal3P'),
+            btype = cms.untracked.string('TriggerTower'),
+            description = cms.untracked.string('Occupancy for TP digis with TTF=4. Masked TTs appear in gray.')
+        ),
+        TTMaskMapAll = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sTriggerTowerTask/%(prefix)sTTT TT Masking Status%(suffix)s'),
+            #kind = cms.untracked.string('TProfile2D'),
+            kind = cms.untracked.string('TH2F'),
+            otype = cms.untracked.string('Ecal3P'),
+            #btype = cms.untracked.string('PseudoStrip'),
+            btype = cms.untracked.string('TriggerTower'),
+            description = cms.untracked.string('Trigger tower masking status: a TT is red if it is masked.')
+        ),
+        ###############
         TTMaskMap = cms.untracked.PSet(
             path = cms.untracked.string('%(subdet)s/%(prefix)sTriggerTowerTask/TTStatus/%(prefix)sTTT TT Masking Status%(sm)s'),
-            kind = cms.untracked.string('TProfile2D'),
+            kind = cms.untracked.string('TH2F'),
             otype = cms.untracked.string('SM'),
             btype = cms.untracked.string('PseudoStrip'),
             description = cms.untracked.string('Trigger tower and pseudo-strip masking status: a TT or strip is red if it is masked')
