@@ -85,18 +85,18 @@ namespace ecaldqm
           me->setBinLabel(1, ss.str());
           ss.str("");
           ss << "TCC" << inner.second << " TT1";
-          me->setBinLabel(25, ss.str());
+          me->setBinLabel(29, ss.str());
           ss.str("");
           ss << "TCC" << outer.first << " TT1";
-          me->setBinLabel(49, ss.str());
+          me->setBinLabel(57, ss.str());
           ss.str("");
           ss << "TCC" << outer.second << " TT1";
-          me->setBinLabel(65, ss.str());
+          me->setBinLabel(73, ss.str());
           int offset(0);
-          for(int iBin(4); iBin <= 80; iBin += 4){
-            if(iBin == 28) offset = 24;
-            else if(iBin == 52) offset = 48;
-            else if(iBin == 68) offset = 64;
+          for(int iBin(4); iBin <= 88; iBin += 4){
+            if(iBin == 32) offset = 28;
+            else if(iBin == 60) offset = 56;
+            else if(iBin == 76) offset = 72;
             ss.str("");
             ss << iBin - offset;
             me->setBinLabel(iBin, ss.str());

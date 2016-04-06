@@ -68,8 +68,8 @@ namespace ecaldqm
           if(tccid <= 36 || tccid >= 73){ // EE
             unsigned bin(ttId(_id));
             bool outer((tccid >= 19 && tccid <= 36) || (tccid >= 73 && tccid <= 90));
-            if(outer) bin += 48;
-            bin += (tccid % 2) * (outer ? 16 : 24);
+            if(outer) bin += 56;
+            bin += (tccid % 2) * (outer ? 16 : 28);
             return bin;
           }
           else
@@ -146,8 +146,8 @@ namespace ecaldqm
           if(tccid <= 36 || tccid >= 73){ // EE
             unsigned bin(ttId(_id));
             bool outer((tccid >= 19 && tccid <= 36) || (tccid >= 73 && tccid <= 90));
-            if(outer) bin += 48;
-            bin += (tccid % 2) * (outer ? 16 : 24);
+            if(outer) bin += 56;
+            bin += (tccid % 2) * (outer ? 16 : 28);
             return bin;
           }
           else

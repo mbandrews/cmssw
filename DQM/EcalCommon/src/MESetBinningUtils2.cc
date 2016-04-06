@@ -214,7 +214,7 @@ namespace ecaldqm
           break;
         case kTriggerTower:
         case kPseudoStrip:
-          specs.nbins = isBarrel ? 68 : 80;
+          specs.nbins = isBarrel ? 68 : 88;
           specs.low = 0.;
           specs.high = specs.nbins;
           specs.title = "tower";
