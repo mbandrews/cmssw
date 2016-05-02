@@ -17,7 +17,8 @@ ecalPresampleClient = cms.untracked.PSet(
         toleranceRMSFwd = cms.untracked.double(toleranceRMSFwd)
     ),
     sources = cms.untracked.PSet(
-        Pedestal = ecalPresampleTask.MEs.Pedestal
+        Pedestal = ecalPresampleTask.MEs.Pedestal,
+        PedestalbyLS = ecalPresampleTask.MEs.PedestalbyLS
     ),
     MEs = cms.untracked.PSet(
         RMS = cms.untracked.PSet(
