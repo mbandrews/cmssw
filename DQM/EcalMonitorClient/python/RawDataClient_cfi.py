@@ -12,6 +12,7 @@ ecalRawDataClient = cms.untracked.PSet(
     sources = cms.untracked.PSet(
         Entries = ecalOccupancyTask.MEs.DCC,
         L1ADCC = ecalRawDataTask.MEs.L1ADCC,
+        FEStatusErrMapByLumi = ecalRawDataTask.MEs.FEStatusErrMapByLumi,
         FEStatus = ecalRawDataTask.MEs.FEStatus
     ),
     MEs = cms.untracked.PSet(

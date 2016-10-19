@@ -2,6 +2,8 @@
 
 #include "DQM/EcalCommon/interface/EcalDQMCommonUtils.h"
 
+#include "CondFormats/EcalObjects/interface/EcalDQMStatusHelper.h"
+
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include <algorithm>
@@ -67,6 +69,7 @@ namespace ecaldqm
     MESet const& sIntegrityByLumi(sources_.at("IntegrityByLumi"));
     MESet const& sDesyncByLumi(sources_.at("DesyncByLumi"));
     MESet const& sFEByLumi(sources_.at("FEByLumi"));
+    MESet const& sFEStatusErrMapByLumi(sources_.at("FEStatusErrMapByLumi"));
 
     double integrityByLumi[nDCC];
     double rawDataByLumi[nDCC];
@@ -106,6 +109,7 @@ namespace ecaldqm
         hasMismatchDCC[iDCC] = true;
     }
 
+		uint32_t mask(1 << EcalDQMStatusHelper::STATUS_FLAG_ERROR);
     MESet::iterator qEnd(meQualitySummary.end());
     for(MESet::iterator qItr(meQualitySummary.beginChannel()); qItr != qEnd; qItr.toNextChannel()){
 
@@ -120,11 +124,13 @@ namespace ecaldqm
       int timing(sTiming ? sTiming->getBinContent(id) : kUnknown);
       int trigprim(sTriggerPrimitives ? sTriggerPrimitives->getBinContent(id) : kUnknown);
       int rawdata(sRawData.getBinContent(id));
+			
+			double rawdataLS(sFEStatusErrMapByLumi.getBinContent(id));
 
       // If there are no RawData or Integrity errors in this LS, set them back to GOOD
       //if(integrity == kBad && integrityByLumi[iDCC] == 0.) integrity = kGood;
       if(integrity == kBad && integrityByLumi[iDCC] == 0. && !hasMismatchDCC[iDCC]) integrity = kGood;
-      if(rawdata == kBad && rawDataByLumi[iDCC] == 0.) rawdata = kGood;
+      if(rawdata == kBad && rawDataByLumi[iDCC] == 0. && rawdataLS == 0.) rawdata = kGood;
 
       // Fill Global Quality Summary
       int status(kGood);
@@ -140,6 +146,8 @@ namespace ecaldqm
         if ( onlineMode_ ) continue;
       }
       qItr->setBinContent(status);
+			//if (iDCC == kEBm06) std::cout << " >>LS" << timestamp_.iLumi << ": SummaryClient | " << smName(iDCC+1) << " | rawdata=" << rawdata << std::endl;
+			if (iDCC == kEEm08) std::cout << " >>LS" << timestamp_.iLumi << ": SummaryClient | " << smName(iDCC+1) << " | rawdata=" << rawdata << std::endl;
 
       // Keep running count of good/bad channels/towers
       if(status == kBad){
@@ -155,9 +163,15 @@ namespace ecaldqm
 
       // Keep running count of good channels in RawData only:
       // Only RawData used in by LS reporting to save memory
-      if(rawdata != kBad){
+			//if(rawdata != kBad){
+      //if( !(rawdataLS > 0. && rawdata != kMBad) ){
+      //if( !(rawdataLS > 0. && (rawdata != kMBad && rawdata != kMUnknown && rawdata != kMGood)) ){
+			bool isMasked(meQualitySummary.maskMatches(id, mask, statusManager_));
+      if( !(rawdataLS > 0. && !isMasked) ){
+      //if( !(rawdataLS > 0. && (rawdata != kMBad || rawdata != kMUnknown)) ){
         dccGoodRaw[iDCC] += 1.;
         totalGoodRaw += 1.;
+				if (iDCC == kEEm08) std::cout << " >>>> isGood" << std::endl;
       }
 
     } // qItr channel loop
@@ -236,6 +250,7 @@ namespace ecaldqm
       meReportSummaryMap.setBinContent(dccid, frac);
       float fracLS(onlineMode_ ? frac : fracRaw);
       meReportSummaryContents.fill(dccid, fracLS); // reported by LS
+			if (iDCC == kEBm06 || iDCC == kEEm08) std::cout << " >>LS" << timestamp_.iLumi << ": SummaryClient | " << smName(dccid) << " | frac=" << fracRaw <<     " = " << dccGoodRaw[iDCC] << "/" << dccChannels[iDCC] << std::endl;
 
       if(1. - frac > fedBadFraction_) nBad += 1.;
     }
