@@ -13,6 +13,7 @@
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/ParticleFlowReco/interface/PFBlockFwd.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
@@ -141,6 +142,17 @@ namespace reco {
     /// return a reference to the corresponding track, if charged. 
     /// otherwise, return a null reference
     reco::TrackRef trackRef() const;
+
+    /// return a pointer to the best track, if available.
+    /// otherwise, return a null pointer
+    virtual const reco::Track * bestTrack() const {
+      if ( (abs(pdgId()) == 11 || pdgId() == 22) && gsfTrackRef().isNonnull() && gsfTrackRef().isAvailable() )
+        return &(*gsfTrackRef());
+      else if ( trackRef().isNonnull() && trackRef().isAvailable() )
+        return &(*trackRef());
+      else
+        return nullptr;
+    }
 
     /// set gsftrack reference 
     void setGsfTrackRef(const reco::GsfTrackRef& ref);   
